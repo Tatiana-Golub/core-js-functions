@@ -32,8 +32,11 @@ function getCurrentFunctionName() {
  *   getFunctionBody(hiHello) => "function hiHello() { console.log('hello world'); }"
  *
  */
-function getFunctionBody(/* func */) {
-  throw new Error('Not implemented');
+function getFunctionBody(func) {
+  if (typeof func !== 'function') {
+    return ''; // Return empty string if no valid function is passed
+  }
+  return func.toString();
 }
 
 /**
@@ -70,8 +73,10 @@ function getArgumentsCount(/* funcs */) {
  *   power05(16) => 4
  *
  */
-function getPowerFunction(/* exponent */) {
-  throw new Error('Not implemented');
+function getPowerFunction(exponent) {
+  return function power(base) {
+    return base ** exponent;
+  };
 }
 
 /**
@@ -105,8 +110,19 @@ function getPolynom() {
  *   ...
  *   memoizer() => the same random number  (next run, returns the previous cached result)
  */
-function memoize(/* func */) {
-  throw new Error('Not implemented');
+function memoize(func) {
+  const cache = {};
+  return (...args) => {
+    const key = JSON.stringify(args);
+
+    if (key in cache) {
+      return cache[key];
+    }
+
+    const result = func(...args);
+    cache[key] = result;
+    return result;
+  };
 }
 
 /**
