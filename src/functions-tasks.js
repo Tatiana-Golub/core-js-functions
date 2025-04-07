@@ -53,8 +53,8 @@ function getFunctionBody(func) {
  *  ]) => [0, 1, 2]
  *
  */
-function getArgumentsCount(/* funcs */) {
-  throw new Error('Not implemented');
+function getArgumentsCount(funcs) {
+  return funcs.map((fn) => fn.length);
 }
 
 /**
@@ -92,8 +92,18 @@ function getPowerFunction(exponent) {
  *   getPolynom(8)     => y = 8
  *   getPolynom()      => null
  */
-function getPolynom() {
-  throw new Error('Not implemented');
+function getPolynom(...args) {
+  if (args.length === 0) {
+    return null;
+  }
+
+  return (x) => {
+    let result = 0;
+    for (let i = 0; i < args.length; i += 1) {
+      result += args[i] * x ** (args.length - 1 - i);
+    }
+    return result;
+  };
 }
 
 /**
@@ -140,10 +150,22 @@ function memoize(func) {
  * }, 2);
  * retryer() => 2
  */
-function retry(/* func, attempts */) {
-  throw new Error('Not implemented');
+function retry(func, attempts) {
+  return function countAttempt(...args) {
+    let currentAttempt = 0;
+    while (currentAttempt < attempts) {
+      try {
+        return func.call(this, ...args);
+      } catch (e) {
+        currentAttempt += 1;
+        if (currentAttempt === attempts) {
+          throw e;
+        }
+      }
+    }
+    return countAttempt;
+  };
 }
-
 /**
  * Returns the logging wrapper for the specified method,
  * Logger has to log the start and end of calling the specified function.
@@ -167,8 +189,23 @@ function retry(/* func, attempts */) {
  * cos(3.141592653589793) ends
  *
  */
-function logger(/* func, logFunc */) {
-  throw new Error('Not implemented');
+function logger(func, logFunc) {
+  return (...args) => {
+    const concatenatedArguments = args
+      .map((arg) => {
+        if (Array.isArray(arg)) {
+          return JSON.stringify(arg);
+        }
+        return arg;
+      })
+      .join(',');
+    logFunc(`${func.name}(${concatenatedArguments}) starts`);
+
+    const result = func.apply(this, args);
+
+    logFunc(`${func.name}(${concatenatedArguments}) ends`);
+    return result;
+  };
 }
 
 /**
@@ -184,8 +221,11 @@ function logger(/* func, logFunc */) {
  *   partialUsingArguments(fn, 'a','b','c')('d') => 'abcd'
  *   partialUsingArguments(fn, 'a','b','c','d')() => 'abcd'
  */
-function partialUsingArguments(/* fn, ...args1 */) {
-  throw new Error('Not implemented');
+function partialUsingArguments(fn, ...args1) {
+  return (...args2) => {
+    const concatenatedArgs = args1.concat(args2);
+    return fn(...concatenatedArgs);
+  };
 }
 
 /**
@@ -205,8 +245,13 @@ function partialUsingArguments(/* fn, ...args1 */) {
  *   getId4() => 7
  *   getId10() => 11
  */
-function getIdGeneratorFunction(/* startFrom */) {
-  throw new Error('Not implemented');
+function getIdGeneratorFunction(startFrom) {
+  let id = startFrom;
+  return () => {
+    const currentId = id;
+    id += 1;
+    return currentId;
+  };
 }
 
 module.exports = {
